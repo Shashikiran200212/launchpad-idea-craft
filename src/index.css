@@ -2,95 +2,132 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Startup Spark Design System - Modern Glassmorphic Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Base Colors - Soft and Modern */
+    --background: 240 20% 99%;
+    --foreground: 240 10% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Card Colors - Glass effect */
+    --card: 240 20% 98%;
+    --card-foreground: 240 10% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Popover Colors */
+    --popover: 240 20% 98%;
+    --popover-foreground: 240 10% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary Brand - Purple/Pink gradient */
+    --primary: 280 90% 65%;
+    --primary-foreground: 240 20% 99%;
+    --primary-glow: 300 80% 75%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Soft Blue */
+    --secondary: 200 95% 95%;
+    --secondary-foreground: 200 40% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Accent - Soft Green */
+    --accent: 150 60% 85%;
+    --accent-foreground: 150 40% 25%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Muted - Neutral */
+    --muted: 240 10% 95%;
+    --muted-foreground: 240 5% 45%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive - Soft Red */
+    --destructive: 0 70% 70%;
+    --destructive-foreground: 240 20% 99%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Borders and Inputs */
+    --border: 240 20% 88%;
+    --input: 240 20% 96%;
+    --ring: 280 90% 65%;
 
-    --radius: 0.5rem;
+    /* Border Radius */
+    --radius: 1rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Glass Effects */
+    --glass-bg: 240 20% 98%;
+    --glass-border: 240 20% 88%;
+    --glass-shadow: 240 10% 20%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(280 90% 65%), hsl(300 80% 75%));
+    --gradient-secondary: linear-gradient(135deg, hsl(200 80% 85%), hsl(220 80% 90%));
+    --gradient-accent: linear-gradient(135deg, hsl(150 60% 85%), hsl(170 60% 90%));
+    --gradient-hero: linear-gradient(135deg, hsl(280 60% 95%), hsl(300 50% 98%));
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Shadows */
+    --shadow-soft: 0 4px 20px hsl(240 10% 20% / 0.08);
+    --shadow-medium: 0 8px 30px hsl(240 10% 20% / 0.12);
+    --shadow-glass: 0 8px 32px hsl(240 10% 20% / 0.1);
+    --shadow-glow: 0 0 40px hsl(280 90% 65% / 0.3);
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar */
+    --sidebar-background: 240 20% 98%;
+    --sidebar-foreground: 240 10% 15%;
+    --sidebar-primary: 280 90% 65%;
+    --sidebar-primary-foreground: 240 20% 99%;
+    --sidebar-accent: 240 20% 95%;
+    --sidebar-accent-foreground: 240 10% 15%;
+    --sidebar-border: 240 20% 88%;
+    --sidebar-ring: 280 90% 65%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark mode - Deep navy with purple accents */
+    --background: 240 15% 8%;
+    --foreground: 240 20% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 240 15% 10%;
+    --card-foreground: 240 20% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 15% 10%;
+    --popover-foreground: 240 20% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 280 90% 70%;
+    --primary-foreground: 240 15% 8%;
+    --primary-glow: 300 80% 80%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 240 20% 15%;
+    --secondary-foreground: 240 20% 85%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 240 20% 20%;
+    --accent-foreground: 240 20% 90%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --muted: 240 15% 15%;
+    --muted-foreground: 240 10% 60%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 60% 60%;
+    --destructive-foreground: 240 20% 95%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 240 15% 20%;
+    --input: 240 15% 15%;
+    --ring: 280 90% 70%;
+
+    --glass-bg: 240 15% 10%;
+    --glass-border: 240 15% 20%;
+    --glass-shadow: 240 10% 5%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(280 90% 70%), hsl(300 80% 80%));
+    --gradient-secondary: linear-gradient(135deg, hsl(240 30% 20%), hsl(260 30% 25%));
+    --gradient-accent: linear-gradient(135deg, hsl(240 20% 20%), hsl(260 20% 25%));
+    --gradient-hero: linear-gradient(135deg, hsl(240 20% 12%), hsl(260 25% 15%));
+
+    --shadow-soft: 0 4px 20px hsl(240 10% 5% / 0.3);
+    --shadow-medium: 0 8px 30px hsl(240 10% 5% / 0.4);
+    --shadow-glass: 0 8px 32px hsl(240 10% 5% / 0.3);
+    --shadow-glow: 0 0 40px hsl(280 90% 70% / 0.4);
+
+    --sidebar-background: 240 15% 10%;
+    --sidebar-foreground: 240 20% 95%;
+    --sidebar-primary: 280 90% 70%;
+    --sidebar-primary-foreground: 240 15% 8%;
+    --sidebar-accent: 240 15% 15%;
+    --sidebar-accent-foreground: 240 20% 90%;
+    --sidebar-border: 240 15% 20%;
+    --sidebar-ring: 280 90% 70%;
   }
 }
 
@@ -100,6 +137,108 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    background: var(--gradient-hero);
+    min-height: 100vh;
   }
+}
+
+@layer components {
+  /* Glass morphism effects */
+  .glass {
+    background: hsl(var(--glass-bg) / 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--glass-border) / 0.2);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-card {
+    @apply glass rounded-3xl p-6;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .bg-gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  .bg-gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  /* Shadow utilities */
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Animation utilities */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-medium);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+  to {
+    box-shadow: 0 0 30px hsl(var(--primary) / 0.6);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--primary) / 0.1),
+    transparent
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
 }
