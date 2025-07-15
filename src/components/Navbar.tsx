@@ -1,19 +1,26 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Lightbulb, Menu, X } from "lucide-react";
+import { Lightbulb, Menu, X, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
   const location = useLocation();
 
-  const navItems = [
+  const publicNavItems = [
     { href: "/", label: "Home" },
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/my-ideas", label: "My Ideas" },
     { href: "/about", label: "About" },
   ];
+  
+  const privateNavItems = [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/my-ideas", label: "My Ideas" },
+  ];
+  
+  const navItems = user ? [...publicNavItems, ...privateNavItems] : publicNavItems;
 
   const isActive = (href: string) => location.pathname === href;
 
@@ -51,12 +58,27 @@ export default function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button variant="ghost" asChild>
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button variant="hero" size="sm" asChild>
-              <Link to="/login">Get Started</Link>
-            </Button>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span>{user.email}</span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Login</Link>
+                </Button>
+                <Button variant="hero" size="sm" asChild>
+                  <Link to="/login">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -90,16 +112,36 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t border-glass-border/20">
-                <Button variant="ghost" asChild>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                    Login
-                  </Link>
-                </Button>
-                <Button variant="hero" asChild>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                    Get Started
-                  </Link>
-                </Button>
+                {user ? (
+                  <>
+                    <div className="px-4 py-2 text-sm text-muted-foreground">
+                      {user.email}
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => {
+                        signOut();
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" asChild>
+                      <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                        Login
+                      </Link>
+                    </Button>
+                    <Button variant="hero" asChild>
+                      <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                        Get Started
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>

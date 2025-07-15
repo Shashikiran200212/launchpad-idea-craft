@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lightbulb, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -12,25 +13,78 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user, signUp, signIn, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    // Since we don't have Supabase yet, show a message
-    toast({
-      title: "Authentication Setup Required",
-      description: "Please connect to Supabase to enable authentication features.",
-      variant: "default"
-    });
+    try {
+      if (isLogin) {
+        const { error } = await signIn(email, password);
+        if (error) {
+          toast({
+            title: "Sign In Failed",
+            description: error.message || "Invalid email or password",
+            variant: "destructive"
+          });
+        }
+      } else {
+        const { error } = await signUp(email, password, name);
+        if (error) {
+          toast({
+            title: "Sign Up Failed",
+            description: error.message || "Failed to create account",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Account Created",
+            description: "Please check your email to confirm your account.",
+            variant: "default"
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    toast({
-      title: "Google Sign-in",
-      description: "Google authentication will be available after Supabase integration.",
-      variant: "default"
-    });
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
+        toast({
+          title: "Google Sign In Failed",
+          description: error.message || "Failed to sign in with Google",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,6 +120,7 @@ export default function Login() {
             variant="outline" 
             className="w-full mb-6" 
             onClick={handleGoogleLogin}
+            disabled={loading}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -175,8 +230,8 @@ export default function Login() {
               </div>
             )}
 
-            <Button type="submit" variant="hero" className="w-full">
-              {isLogin ? "Sign In" : "Create Account"}
+            <Button type="submit" variant="hero" className="w-full" disabled={loading}>
+              {loading ? "Loading..." : (isLogin ? "Sign In" : "Create Account")}
             </Button>
           </form>
 

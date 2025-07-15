@@ -12,8 +12,10 @@ import {
   Check,
   ArrowRight
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
   const features = [
     {
       icon: Lightbulb,
@@ -240,8 +242,8 @@ export default function Home() {
               with our AI-powered platform.
             </p>
             <Button variant="hero" size="xl" asChild>
-              <Link to="/dashboard">
-                Start Creating Today
+              <Link to={user ? "/dashboard" : "/login"}>
+                {user ? "Go to Dashboard" : "Start Creating Today"}
                 <Sparkles className="w-5 h-5 ml-2" />
               </Link>
             </Button>

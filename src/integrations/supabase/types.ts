@@ -251,6 +251,48 @@ export type Database = {
           },
         ]
       }
+      startup_ideas: {
+        Row: {
+          business_model: string | null
+          created_at: string
+          features: string[]
+          id: string
+          problem: string
+          solution: string
+          tagline: string
+          target_audience: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_model?: string | null
+          created_at?: string
+          features?: string[]
+          id?: string
+          problem: string
+          solution: string
+          tagline: string
+          target_audience?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_model?: string | null
+          created_at?: string
+          features?: string[]
+          id?: string
+          problem?: string
+          solution?: string
+          tagline?: string
+          target_audience?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
