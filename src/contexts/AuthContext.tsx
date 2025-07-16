@@ -66,13 +66,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signUp = async (email: string, password: string, fullName?: string) => {
     try {
-      cleanupAuthState();
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        // Continue even if this fails
-      }
-
       const redirectUrl = `${window.location.origin}/`;
       
       const { data, error } = await supabase.auth.signUp({
@@ -92,10 +85,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return { error: { message: 'Please check your email to confirm your account.' } };
       }
 
-      if (data.user) {
-        window.location.href = '/dashboard';
-      }
-
       return { error: null };
     } catch (error) {
       return { error };
@@ -104,13 +93,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      cleanupAuthState();
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        // Continue even if this fails
-      }
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -118,10 +100,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       if (error) return { error };
       
-      if (data.user) {
-        window.location.href = '/dashboard';
-      }
-
       return { error: null };
     } catch (error) {
       return { error };

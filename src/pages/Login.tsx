@@ -37,6 +37,12 @@ export default function Login() {
             description: error.message || "Invalid email or password",
             variant: "destructive"
           });
+        } else {
+          toast({
+            title: "Success",
+            description: "Signed in successfully!",
+          });
+          navigate('/dashboard');
         }
       } else {
         const { error } = await signUp(email, password, name);
