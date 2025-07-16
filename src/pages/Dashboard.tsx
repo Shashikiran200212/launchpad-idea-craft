@@ -17,6 +17,9 @@ import {
   DollarSign
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface GeneratedIdea {
   name: string;
@@ -34,7 +37,10 @@ export default function Dashboard() {
   const [interests, setInterests] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedIdea, setGeneratedIdea] = useState<GeneratedIdea | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleGenerate = async () => {
     if (!interests.trim()) {
@@ -78,13 +84,52 @@ export default function Dashboard() {
     }, 3000);
   };
 
-  const handleSave = () => {
-    if (!generatedIdea) return;
+  const handleSave = async () => {
+    if (!generatedIdea || !user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save your ideas",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    toast({
-      title: "Idea saved!",
-      description: "Your startup idea has been saved to your account. Connect Supabase to persist data.",
-    });
+    setIsSaving(true);
+    
+    try {
+      const { data, error } = await supabase
+        .from('startup_ideas')
+        .insert({
+          title: generatedIdea.name,
+          tagline: generatedIdea.tagline,
+          problem: generatedIdea.problem,
+          solution: generatedIdea.solution,
+          target_audience: generatedIdea.targetAudience,
+          business_model: generatedIdea.revenue,
+          features: generatedIdea.features,
+          user_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Idea saved!",
+        description: "Your startup idea has been saved successfully.",
+      });
+
+      // Navigate to the saved idea details page
+      navigate(`/idea/${data.id}`);
+    } catch (error) {
+      toast({
+        title: "Error saving idea",
+        description: "Failed to save your idea. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -225,9 +270,14 @@ export default function Dashboard() {
                         <Eye className="w-4 h-4 mr-1" />
                         Preview
                       </Button>
-                      <Button variant="hero" size="sm" onClick={handleSave}>
+                      <Button 
+                        variant="hero" 
+                        size="sm" 
+                        onClick={handleSave}
+                        disabled={isSaving}
+                      >
                         <Save className="w-4 h-4 mr-1" />
-                        Save
+                        {isSaving ? "Saving..." : "Save"}
                       </Button>
                     </div>
                   </div>
@@ -291,10 +341,10 @@ export default function Dashboard() {
           {/* Bottom Notice */}
           <div className="mt-12 text-center">
             <div className="glass-card max-w-2xl mx-auto">
-              <h3 className="font-semibold mb-2">💡 Demo Mode</h3>
+              <h3 className="font-semibold mb-2">🚀 Connected to Supabase</h3>
               <p className="text-sm text-muted-foreground">
-                This is a demonstration. For real AI-powered idea generation and data persistence, 
-                connect your project to Supabase and integrate with AI services.
+                Your ideas are automatically saved to your Supabase database. 
+                Generate, save, and share your startup concepts with the community!
               </p>
             </div>
           </div>

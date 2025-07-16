@@ -11,71 +11,91 @@ import {
   Star,
   Calendar,
   TrendingUp,
-  Plus
+  Plus,
+  Share2
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
-interface SavedIdea {
+interface StartupIdea {
   id: string;
-  name: string;
+  title: string;
   tagline: string;
-  category: string;
-  dateCreated: string;
-  isFavorite: boolean;
-  status: "draft" | "published" | "archived";
+  problem: string;
+  solution: string;
+  target_audience: string | null;
+  business_model: string | null;
+  features: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 export default function MyIdeas() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [ideas, setIdeas] = useState<StartupIdea[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  // Mock data - in real app this would come from Supabase
-  const savedIdeas: SavedIdea[] = [
-    {
-      id: "1",
-      name: "EcoTrack",
-      tagline: "Making sustainability simple for everyone",
-      category: "Environmental",
-      dateCreated: "2024-01-15",
-      isFavorite: true,
-      status: "draft"
-    },
-    {
-      id: "2", 
-      name: "StudyBuddy",
-      tagline: "AI-powered study companion for students",
-      category: "Education",
-      dateCreated: "2024-01-12",
-      isFavorite: false,
-      status: "published"
-    },
-    {
-      id: "3",
-      name: "FoodShare",
-      tagline: "Reducing food waste through community sharing",
-      category: "Social Impact",
-      dateCreated: "2024-01-10",
-      isFavorite: true,
-      status: "draft"
+  useEffect(() => {
+    if (user) {
+      fetchIdeas();
     }
-  ];
+  }, [user]);
 
-  const filteredIdeas = savedIdeas.filter(idea => {
-    const matchesSearch = idea.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         idea.tagline.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = selectedFilter === "all" || idea.status === selectedFilter;
-    return matchesSearch && matchesFilter;
-  });
+  const fetchIdeas = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('startup_ideas')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "published": return "bg-primary/10 text-primary";
-      case "draft": return "bg-muted text-muted-foreground";
-      case "archived": return "bg-destructive/10 text-destructive";
-      default: return "bg-muted text-muted-foreground";
+      if (error) throw error;
+      setIdeas(data || []);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch ideas",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
+  const deleteIdea = async (ideaId: string) => {
+    try {
+      const { error } = await supabase
+        .from('startup_ideas')
+        .delete()
+        .eq('id', ideaId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+      
+      setIdeas(prev => prev.filter(idea => idea.id !== ideaId));
+      toast({
+        title: "Success",
+        description: "Idea deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete idea",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const filteredIdeas = ideas.filter(idea => {
+    const matchesSearch = idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         idea.tagline.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  });
 
   return (
     <div className="min-h-screen">
@@ -110,32 +130,30 @@ export default function MyIdeas() {
               <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-3">
                 <Lightbulb className="w-6 h-6 text-white" />
               </div>
-              <div className="text-2xl font-bold mb-1">{savedIdeas.length}</div>
+              <div className="text-2xl font-bold mb-1">{ideas.length}</div>
               <div className="text-sm text-muted-foreground">Total Ideas</div>
             </div>
             <div className="glass-card text-center">
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Star className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold mb-1">
-                {savedIdeas.filter(idea => idea.isFavorite).length}
-              </div>
+              <div className="text-2xl font-bold mb-1">0</div>
               <div className="text-sm text-muted-foreground">Favorites</div>
             </div>
             <div className="glass-card text-center">
               <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-3">
                 <TrendingUp className="w-6 h-6 text-accent-foreground" />
               </div>
-              <div className="text-2xl font-bold mb-1">
-                {savedIdeas.filter(idea => idea.status === "published").length}
-              </div>
+              <div className="text-2xl font-bold mb-1">{ideas.length}</div>
               <div className="text-sm text-muted-foreground">Published</div>
             </div>
             <div className="glass-card text-center">
               <div className="w-12 h-12 bg-secondary/50 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Calendar className="w-6 h-6 text-secondary-foreground" />
               </div>
-              <div className="text-2xl font-bold mb-1">3</div>
+              <div className="text-2xl font-bold mb-1">{ideas.filter(idea => 
+                new Date(idea.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+              ).length}</div>
               <div className="text-sm text-muted-foreground">This Week</div>
             </div>
           </div>
@@ -152,24 +170,19 @@ export default function MyIdeas() {
                   className="pl-10 glass"
                 />
               </div>
-              <div className="flex items-center space-x-2">
-                <Filter className="w-5 h-5 text-muted-foreground" />
-                <select
-                  value={selectedFilter}
-                  onChange={(e) => setSelectedFilter(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-input bg-background text-sm"
-                >
-                  <option value="all">All Ideas</option>
-                  <option value="draft">Drafts</option>
-                  <option value="published">Published</option>
-                  <option value="archived">Archived</option>
-                </select>
+              <div className="text-sm text-muted-foreground">
+                {filteredIdeas.length} of {ideas.length} ideas
               </div>
             </div>
           </div>
 
           {/* Ideas Grid */}
-          {filteredIdeas.length === 0 ? (
+          {loading ? (
+            <div className="glass-card text-center py-12">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading your ideas...</p>
+            </div>
+          ) : filteredIdeas.length === 0 ? (
             <div className="glass-card text-center py-12">
               <Lightbulb className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
               <h3 className="text-xl font-semibold mb-2">No ideas found</h3>
@@ -193,49 +206,49 @@ export default function MyIdeas() {
                 >
                   {/* Header */}
                   <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
-                        <Lightbulb className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(idea.status)}`}>
-                          {idea.status.charAt(0).toUpperCase() + idea.status.slice(1)}
-                        </span>
-                      </div>
+                    <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
+                      <Lightbulb className="w-5 h-5 text-white" />
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Star 
-                        className={`w-4 h-4 ${idea.isFavorite ? 'text-yellow-500 fill-current' : 'text-muted-foreground'}`} 
-                      />
-                    </Button>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(idea.created_at).toLocaleDateString()}
+                    </div>
                   </div>
 
                   {/* Content */}
                   <div className="mb-4">
-                    <h3 className="text-xl font-semibold mb-2">{idea.name}</h3>
+                    <h3 className="text-xl font-semibold mb-2">{idea.title}</h3>
                     <p className="text-sm text-muted-foreground mb-3 italic">
                       "{idea.tagline}"
                     </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{idea.category}</span>
-                      <span>{new Date(idea.dateCreated).toLocaleDateString()}</span>
-                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      <strong>Problem:</strong> {idea.problem}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      <strong>Solution:</strong> {idea.solution}
+                    </p>
+                    {idea.features.length > 0 && (
+                      <div className="text-xs text-muted-foreground">
+                        <strong>Key Features:</strong> {idea.features.slice(0, 2).join(", ")}
+                        {idea.features.length > 2 && ` +${idea.features.length - 2} more`}
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions */}
                   <div className="flex space-x-2">
                     <Button variant="outline" size="sm" className="flex-1">
                       <Eye className="w-4 h-4 mr-1" />
-                      View
+                      View Details
                     </Button>
                     <Button variant="ghost" size="sm">
-                      <Edit className="w-4 h-4" />
+                      <Share2 className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => deleteIdea(idea.id)}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -247,10 +260,10 @@ export default function MyIdeas() {
           {/* Bottom Notice */}
           <div className="mt-12 text-center">
             <div className="glass-card max-w-2xl mx-auto">
-              <h3 className="font-semibold mb-2">💾 Data Persistence</h3>
+              <h3 className="font-semibold mb-2">🚀 Your Ideas</h3>
               <p className="text-sm text-muted-foreground">
-                Connect to Supabase to permanently save your ideas and access them across devices. 
-                Currently showing demo data.
+                All your startup ideas are automatically saved and synced with Supabase. 
+                Share them with the community or keep them private.
               </p>
             </div>
           </div>

@@ -10,6 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import MyIdeas from "./pages/MyIdeas";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import IdeaDetails from "./pages/IdeaDetails";
+import CommunityIdeas from "./pages/CommunityIdeas";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/my-ideas" element={<ProtectedRoute><MyIdeas /></ProtectedRoute>} />
+            <Route path="/idea/:id" element={<IdeaDetails />} />
+            <Route path="/community" element={<CommunityIdeas />} />
             <Route path="/about" element={<About />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

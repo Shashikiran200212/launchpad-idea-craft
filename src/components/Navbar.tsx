@@ -18,6 +18,7 @@ export default function Navbar() {
   const privateNavItems = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/my-ideas", label: "My Ideas" },
+    { href: "/community", label: "Community" },
   ];
   
   const navItems = user ? [...publicNavItems, ...privateNavItems] : publicNavItems;
